@@ -10,9 +10,20 @@ class InverseNumberSteam extends Transform {
     }
 }
 
-const server = http.createServer((req, res) => {
-    req.pipe(new InverseNumberSteam())
-    .pipe(res);
+const server = http.createServer(async (req, res) => {
+    const buffers = [];
+
+    for await (const chunk of req) {
+        console.log(chunk);
+        console.log(chunk.toString());
+        buffers.push(chunk);
+    }
+
+    const fullStreamContent = Buffer.concat(buffers).toString();
+
+    console.log(fullStreamContent);
+
+    return res.end(fullStreamContent);
 });
 
 server.listen(3334);
