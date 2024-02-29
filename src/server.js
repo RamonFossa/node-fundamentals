@@ -1,4 +1,5 @@
 import http from 'node:http';
+import { json } from './middlewares/json.js';
 
 // Common HTTP Methods: GET, POST, PUT, PATCH, DELETE
 
@@ -18,25 +19,11 @@ const server = http.createServer(async (req, res) => {
     const { url, method } = req;
     console.log('REQ => ', url, method);
 
-    const buffers = [];
-
-    for await (const chunk of req) {
-        console.log(chunk);
-        console.log(chunk.toString());
-        buffers.push(chunk);
-    }
-
-    try {
-        req.body = JSON.parse(Buffer.concat(buffers).toString());
-    } catch {
-        req.body = null;
-    }
-
-    console.log(req.body);
+    await json(req, res);
 
     if(url === '/' && method === 'GET') return res.writeHead(200).end('Hello, World!');
 
-    if(url === '/users' && method === 'GET') return res.setHeader('Content-type', 'application/json').writeHead(200).end(JSON.stringify(users));
+    if(url === '/users' && method === 'GET') return res.writeHead(200).end(JSON.stringify(users));
 
     if(url === '/users' && method === 'POST') {
         const { name, email } = req.body;
