@@ -1,5 +1,6 @@
 import http from 'node:http';
 import { json } from './middlewares/json.js';
+import { Database } from './database.js';
 
 // Common HTTP Methods: GET, POST, PUT, PATCH, DELETE
 
@@ -13,7 +14,7 @@ import { json } from './middlewares/json.js';
 
 // Headers req/res => MetaData
 
-const users = [];
+const database = new Database();
 
 const server = http.createServer(async (req, res) => {
     const { url, method } = req;
@@ -23,16 +24,16 @@ const server = http.createServer(async (req, res) => {
 
     if(url === '/' && method === 'GET') return res.writeHead(200).end('Hello, World!');
 
-    if(url === '/users' && method === 'GET') return res.writeHead(200).end(JSON.stringify(users));
+    if(url === '/users' && method === 'GET') return res.writeHead(200).end(JSON.stringify(database.select('users')));
 
     if(url === '/users' && method === 'POST') {
         const { name, email } = req.body;
 
-        users.push({
+        const user = {
             name,
             email,
-        });
-
+        };
+        database.insert('users', user);
         return res.writeHead(201).end('User created successfully!');
     }
 
