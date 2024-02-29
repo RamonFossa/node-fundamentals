@@ -1,5 +1,6 @@
 import http from 'node:http';
 import { json } from './middlewares/json.js';
+import { randomUUID } from 'node:crypto';
 import { Database } from './database.js';
 
 // Common HTTP Methods: GET, POST, PUT, PATCH, DELETE
@@ -13,6 +14,9 @@ import { Database } from './database.js';
 // Stateful - Stateless
 
 // Headers req/res => MetaData
+
+// UUID => Unique Universal ID
+
 
 const database = new Database();
 
@@ -30,6 +34,7 @@ const server = http.createServer(async (req, res) => {
         const { name, email } = req.body;
 
         const user = {
+            id: randomUUID(),
             name,
             email,
         };
