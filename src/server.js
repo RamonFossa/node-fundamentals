@@ -1,7 +1,6 @@
 import http from 'node:http';
 import { json } from './middlewares/json.js';
-import { randomUUID } from 'node:crypto';
-import { Database } from './database.js';
+import { routes } from './routes.js';
 
 // Common HTTP Methods: GET, POST, PUT, PATCH, DELETE
 
@@ -18,7 +17,6 @@ import { Database } from './database.js';
 // UUID => Unique Universal ID
 
 
-const database = new Database();
 
 const server = http.createServer(async (req, res) => {
     const { url, method } = req;
@@ -26,21 +24,9 @@ const server = http.createServer(async (req, res) => {
 
     await json(req, res);
 
-    if(url === '/' && method === 'GET') return res.writeHead(200).end('Hello, World!');
+    const route = routes.find(route => route.method === method && route.path === url);
 
-    if(url === '/users' && method === 'GET') return res.writeHead(200).end(JSON.stringify(database.select('users')));
-
-    if(url === '/users' && method === 'POST') {
-        const { name, email } = req.body;
-
-        const user = {
-            id: randomUUID(),
-            name,
-            email,
-        };
-        database.insert('users', user);
-        return res.writeHead(201).end('User created successfully!');
-    }
+    if(route) return route.handler(req, res);
 
     return res.writeHead(404).end();
 });
