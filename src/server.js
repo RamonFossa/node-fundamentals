@@ -16,6 +16,15 @@ import { routes } from './routes.js';
 
 // UUID => Unique Universal ID
 
+// Ways to receive parameters >>>>>>>>>>
+
+// Query Parameters: URL Stateful => Filters, Paging
+// http://localhost:3333/users?userId=1&name=Ramon
+
+// Route Parameters:
+// http://localhost:3333/users/1
+
+// Request Body: Body for request, usually a JSON;
 
 
 const server = http.createServer(async (req, res) => {
