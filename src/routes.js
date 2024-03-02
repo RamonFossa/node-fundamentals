@@ -9,7 +9,12 @@ export const routes = [
         method: 'GET',
         path: buildRoutePath('/users'),
         handler: (req, res) => {
-            return res.writeHead(200).end(JSON.stringify(database.select('users')));
+            const { search } = req.query;
+
+            return res.writeHead(200).end(JSON.stringify(database.select('users', search ? {
+                name: search,
+                email: search
+            } : null)));
         },
     },
     {
@@ -23,16 +28,34 @@ export const routes = [
                 name,
                 email,
             };
-            
+        
             database.insert('users', user);
             return res.writeHead(201).end('User created successfully!');
         },
     },
     {
-        method: 'DELETE',
-        path: buildRoutePath('/users/:id/Nha/:o'),
+        method: 'PUT',
+        path: buildRoutePath('/users/:id'),
         handler: (req, res) => {
-            return res.end('DELETOU');
+            const { id } = req.params;
+            const { email, name } = req.body;
+
+            const databaseRes = database.update('users', id, {name, email});
+            
+            const { error, message } = databaseRes;
+
+            return res.writeHead(error ? 404 : 200).end(message);
+        },
+    },
+    {
+        method: 'DELETE',
+        path: buildRoutePath('/users/:id'),
+        handler: (req, res) => {
+            const { id } = req.params;
+            const databaseRes = database.delete('users', id);
+            const { error, message } = databaseRes;
+
+            return res.writeHead(error ? 404 : 200).end(message);
         },
     },
 ]
